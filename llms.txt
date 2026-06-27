@@ -1,0 +1,62 @@
+# emoji del día
+
+> A minimalist single-page mood tracker. One question per day, one emoji per answer, one funny description that is neither therapeutic nor scientifically valid. Available in Spanish, English, and Portuguese.
+
+## What it does
+
+The app asks "how are you feeling today?" and returns a date-seeded emoji + a short, self-aware description in the user's language. The same mood on the same day always returns the same emoji — results are deterministic but can be re-rolled with a randomizer.
+
+A 30-day history grid shows past entries. One mood per day. Everything is stored in the browser via LocalStorage — no data leaves the device.
+
+## Moods
+
+- Feliz / Happy / Feliz (😊)
+- Cansado / Tired / Cansado (😴)
+- Estresado / Stressed / Estressado (😤)
+- Motivado / Motivated / Motivado (💪)
+- Caótico / Chaotic / Caótico (🌀)
+- Misterioso / Mysterious / Misterioso (🕵️)
+- Hambriento / Hungry / Faminto (🍕)
+- Filosófico / Philosophical / Filosófico (🤔)
+
+## Key behaviors
+
+- **Date-seeded picks**: `seededRandom(dateDigits + moodId.length * 37)` — deterministic per day
+- **Randomizer**: free re-roll from the mood's emoji pool (slot-machine animation, ~16 ticks at 75ms)
+- **History**: last 30 days, stored as `{ moodId, idx }` in `localStorage` key `emojiday_v2`
+- **Theme**: dark / light via `document.startViewTransition()` + CSS `::view-transition-*`
+- **Language detection**: reads `navigator.languages`, maps base code to `es | en | pt`, falls back to `es`
+- **Easter egg**: clicking the sun logo 7 times within 1.8 s triggers a hidden modal
+
+## Tech stack
+
+| Layer | Detail |
+|---|---|
+| Markup | Single `index.html` |
+| Styles | CSS custom properties, View Transitions API |
+| Logic | Vanilla JS (ES2020), no framework, no bundler |
+| Font | Space Grotesk via Google Fonts |
+| Storage | `localStorage` only — no network requests from app logic |
+| Favicon | Adaptive SVG (`favicon.svg`) with `prefers-color-scheme` |
+
+## Languages
+
+Fully translated UI and descriptions: Spanish (`es`), English (`en`), Portuguese (`pt`).
+Auto-detected from `navigator.languages` on first visit. Persisted in `localStorage`.
+
+## Author
+
+Hector Mendoza — https://www.hectormendoza.me/
+
+## License
+
+MIT — Copyright (c) 2026 Hector Mendoza
+
+## Files
+
+- `index.html` — the entire application
+- `favicon.svg` — adaptive sun-face icon
+- `robots.txt` — crawler permissions
+- `llms.txt` — this file
+- `LICENSE` — MIT license
+- `README.md` — project overview

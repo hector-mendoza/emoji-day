@@ -4,6 +4,108 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>emoji del día</title>
+
+  <!-- ── SEO ── -->
+  <meta name="description" id="meta-desc" content="Un diagnóstico emocional de dudosa precisión. Elige tu humor del día y descubre tu emoji. Disponible en español, inglés y portugués.">
+  <meta name="keywords" content="emoji del día, mood tracker, humor del día, estado emocional, emoji diario, daily mood, rastreador de humor">
+  <meta name="author" content="Hector Mendoza">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <meta name="theme-color" content="#111110" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#faf9f6" media="(prefers-color-scheme: light)">
+
+  <!-- ── Open Graph ── -->
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       id="og-title" content="emoji del día — un diagnóstico emocional de dudosa precisión">
+  <meta property="og:description" id="og-desc"  content="Elige tu humor del día y descubre tu emoji. Una forma consistente (y ligeramente irónica) de llevar un registro emocional.">
+  <meta property="og:locale"             content="es_ES">
+  <meta property="og:locale:alternate"   content="en_US">
+  <meta property="og:locale:alternate"   content="pt_BR">
+  <meta property="og:site_name"   content="emoji del día">
+  <!-- og:url and og:image: set these to your deployed URL -->
+
+  <!-- ── Twitter / X Card ── -->
+  <meta name="twitter:card"        content="summary">
+  <meta name="twitter:title"       content="emoji del día">
+  <meta name="twitter:description" content="Un diagnóstico emocional de dudosa precisión. Tu emoji del día, seeded por fecha.">
+
+  <!-- ── GEO (Generative Engine Optimization) ── -->
+  <meta name="ai-content-declaration" content="human-authored">
+  <!-- canonical: set to your deployed URL -->
+
+  <!-- ── Structured data (WebApplication + FAQPage) ── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "emoji del día",
+        "alternateName": ["emoji of the day", "emoji do dia"],
+        "description": "A single-page mood tracker that assigns a date-seeded emoji based on how you feel. Funny descriptions, 30-day history, no backend.",
+        "applicationCategory": "LifestyleApplication",
+        "operatingSystem": "Any modern web browser",
+        "inLanguage": ["es", "en", "pt"],
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "author": {
+          "@type": "Person",
+          "name": "Hector Mendoza",
+          "url": "https://www.hectormendoza.me/"
+        },
+        "license": "https://opensource.org/licenses/MIT",
+        "keywords": "mood tracker, emoji, daily mood, humor del día, estado emocional",
+        "featureList": [
+          "Date-seeded emoji picks — same mood same day always returns the same emoji",
+          "Emoji randomizer with slot-machine animation",
+          "30-day mood history stored in LocalStorage",
+          "Dark and light theme with View Transitions API",
+          "Multilingual: Spanish, English, Portuguese",
+          "Auto-detects browser language on first visit",
+          "Zero dependencies — plain HTML, CSS, and vanilla JavaScript",
+          "No backend, no accounts, no data leaves the device"
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Qué es emoji del día?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Una app de una sola página que te pregunta cómo te sientes y te asigna un emoji del día con una descripción corta y divertida. El resultado está determinado por la fecha: el mismo humor el mismo día siempre da el mismo emoji."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Guarda mis datos en la nube?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Todo se guarda exclusivamente en LocalStorage en tu dispositivo. No hay backend, no hay cuenta, no hay datos que salgan de tu navegador."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What languages does emoji del día support?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Spanish (es), English (en), and Portuguese (pt). The app auto-detects your browser language on first visit and all UI text and descriptions are fully translated."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does it work offline?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, after the initial load. The only external dependency is the Space Grotesk font from Google Fonts. All logic runs in the browser with no network calls."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -489,6 +591,8 @@ const UI = {
     registeredOn: 'Registrado el',
     closeEaster:  'Cerrar esto inmediatamente',
     logoTitle:    'haz clic varias veces… si te atreves',
+    metaDesc:     'Un diagnóstico emocional de dudosa precisión. Elige tu humor del día y descubre tu emoji. Historial de 30 días, sin cuentas, sin backend.',
+    ogTitle:      'emoji del día — un diagnóstico emocional de dudosa precisión',
     moods: { feliz:'Feliz', cansado:'Cansado', estresado:'Estresado', motivado:'Motivado', caotico:'Caótico', misterioso:'Misterioso', hambriento:'Hambriento', filosofico:'Filosófico' },
     easter: [
       { emoji:'👁️', title:'¡TE ESTÁBAMOS ESPERANDO!',   desc:'Sabíamos que eventualmente llegarías aquí. Todos los usuarios con demasiado tiempo libre terminan haciendo clic siete veces. Tu diagnóstico real: curiosidad patológica con tendencia a ignorar advertencias implícitas. Bienvenido al club.' },
@@ -520,6 +624,8 @@ const UI = {
     registeredOn: 'Logged on',
     closeEaster:  'Close this immediately',
     logoTitle:    'click several times… if you dare',
+    metaDesc:     'An emotional diagnosis of questionable accuracy. Pick your mood and get your emoji of the day. 30-day history, no accounts, no backend.',
+    ogTitle:      'emoji of the day — an emotional diagnosis of questionable accuracy',
     moods: { feliz:'Happy', cansado:'Tired', estresado:'Stressed', motivado:'Motivated', caotico:'Chaotic', misterioso:'Mysterious', hambriento:'Hungry', filosofico:'Philosophical' },
     easter: [
       { emoji:'👁️', title:'WE WERE EXPECTING YOU!',     desc:"We knew you'd end up here eventually. Every user with too much free time clicks seven times. Your actual diagnosis: pathological curiosity with a tendency to ignore implicit warnings. Welcome to the club." },
@@ -551,6 +657,8 @@ const UI = {
     registeredOn: 'Registrado em',
     closeEaster:  'Fechar isso imediatamente',
     logoTitle:    'clique várias vezes… se tiver coragem',
+    metaDesc:     'Um diagnóstico emocional de duvidosa precisão. Escolha seu humor do dia e descubra seu emoji. Histórico de 30 dias, sem contas, sem backend.',
+    ogTitle:      'emoji do dia — um diagnóstico emocional de duvidosa precisão',
     moods: { feliz:'Feliz', cansado:'Cansado', estresado:'Estressado', motivado:'Motivado', caotico:'Caótico', misterioso:'Misterioso', hambriento:'Faminto', filosofico:'Filosófico' },
     easter: [
       { emoji:'👁️', title:'ESTÁVAMOS TE ESPERANDO!',    desc:'Sabíamos que você chegaria aqui eventualmente. Todo usuário com tempo livre demais acaba clicando sete vezes. Diagnóstico real: curiosidade patológica com tendência a ignorar avisos implícitos. Bem-vindo ao clube.' },
@@ -700,6 +808,9 @@ function applyLang(lang) {
   const t = UI[lang];
   document.documentElement.lang = LANG_META[lang].htmlLang;
   document.title = t.title;
+  document.getElementById('meta-desc').content = t.metaDesc;
+  document.getElementById('og-title').content  = t.ogTitle;
+  document.getElementById('og-desc').content   = t.metaDesc;
   document.getElementById('site-title').textContent  = t.title;
   document.getElementById('subtitle').textContent    = t.subtitle;
   document.getElementById('question').textContent    = t.question;
