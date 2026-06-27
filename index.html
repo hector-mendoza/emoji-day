@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>emoji del día</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #111110;
+      --surface: #1a1a18;
+      --surface-2: #222220;
+      --border: #2c2c28;
+      --accent: #d97941;
+      --accent-dim: #3a2518;
+      --text: #f0efec;
+      --text-muted: #888880;
+      --text-dim: #3a3a36;
+      --radius: 12px;
+      --radius-sm: 7px;
+      --font: 'Space Grotesk', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    }
+    [data-theme="light"] {
+      --bg: #faf9f6;
+      --surface: #f2f0eb;
+      --surface-2: #e8e5de;
+      --border: #d0cdc5;
+      --accent: #c86a2e;
+      --accent-dim: #f5e5d4;
+      --text: #1a1916;
+      --text-muted: #7a7568;
+      --text-dim: #c4c0b5;
+    }
+
+    /* View Transitions */
+    ::view-transition-old(root) { animation: vt-shrink 220ms ease-in  forwards; }
+    ::view-transition-new(root) { animation: vt-grow  280ms ease-out forwards; }
+    @keyframes vt-shrink { to   { opacity:0; transform:scale(1.04) rotate(.4deg); filter:blur(3px); } }
+    @keyframes vt-grow   { from { opacity:0; transform:scale(.96)  rotate(-.4deg); filter:blur(3px); } }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2.25rem 1rem 3rem;
+      transition: background .25s, color .25s;
+    }
+
+    /* ── Keyframes ── */
+    @keyframes fade-up   { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:none} }
+    @keyframes pop-in    { 0%{opacity:0;transform:scale(.4) rotate(-8deg)} 65%{transform:scale(1.18) rotate(3deg)} 100%{opacity:1;transform:none} }
+    @keyframes stagger   { from{opacity:0;transform:scale(.82)} to{opacity:1;transform:none} }
+    @keyframes wiggle    { 0%,100%{transform:rotate(0)} 30%{transform:rotate(-10deg)} 70%{transform:rotate(10deg)} }
+    @keyframes shake     { 0%,100%{transform:none} 15%{transform:translateX(-7px) rotate(-2deg)} 35%{transform:translateX(7px) rotate(2deg)} 55%{transform:translateX(-5px)} 75%{transform:translateX(4px)} }
+    @keyframes bounce-in { 0%{opacity:0;transform:translateY(-30px)} 60%{transform:translateY(6px)} 80%{transform:translateY(-3px)} 100%{opacity:1;transform:none} }
+    @keyframes slot-spin { 0%,100%{opacity:1;transform:none} 45%{opacity:.2;transform:translateY(-10px) scale(.8)} 55%{opacity:.2;transform:translateY(10px) scale(.8)} }
+    @keyframes overlay-pop { 0%{opacity:0;transform:scale(.1)} 35%{opacity:1;transform:scale(1.6)} 70%{opacity:1;transform:scale(1.4)} 100%{opacity:0;transform:scale(2.2)} }
+    @keyframes logo-spin  { to { transform:rotate(360deg); } }
+
+    /* ── Header ── */
+    header {
+      width: 100%;
+      max-width: 540px;
+      margin-bottom: 2.25rem;
+      animation: fade-up .4s ease both;
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .65rem;
+      position: relative;
+    }
+    .logo {
+      cursor: pointer;
+      flex-shrink: 0;
+      color: var(--text);
+      transition: color .15s;
+      user-select: none;
+      line-height: 0;
+    }
+    .logo:hover { color: var(--accent); }
+    .logo.spinning svg { animation: logo-spin .5s ease both; }
+
+    header h1 {
+      font-size: clamp(1.4rem, 4.5vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -.04em;
+      color: var(--text);
+      text-transform: uppercase;
+    }
+    header > p {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: .82rem;
+      margin-top: .45rem;
+      font-weight: 400;
+    }
+
+    /* controls */
+    .ctrl-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: var(--font);
+      font-weight: 700;
+      line-height: 1;
+      transition: border-color .12s, color .12s, transform .12s;
+      color: var(--text-muted);
+    }
+    .ctrl-btn:hover { border-color: var(--accent); color: var(--text); transform: translateY(-50%) scale(1.08); }
+    #lang-toggle  { left: 0;  padding: .3rem .6rem; font-size: .72rem; letter-spacing: .06em; }
+    #theme-toggle { right: 0; padding: .3rem .55rem; font-size: .95rem; }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      width: 100%;
+      max-width: 540px;
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── Mood selector ── */
+    #screen-selector { animation: fade-up .35s ease both; }
+    #screen-selector .question {
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 1.4rem;
+      letter-spacing: -.025em;
+    }
+    .mood-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(126px, 1fr));
+      gap: .55rem;
+    }
+    .mood-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .38rem;
+      padding: .95rem .5rem;
+      font-size: .88rem;
+      font-weight: 600;
+      font-family: var(--font);
+      letter-spacing: -.01em;
+      transition: border-color .12s, background .12s;
+      animation: stagger .35s ease both;
+    }
+    .mood-btn:hover { border-color: var(--accent); background: var(--accent-dim); }
+    .mood-btn:hover .mood-icon { animation: wiggle .4s ease; }
+    .mood-icon { font-size: 1.75rem; line-height: 1; display: block; }
+    .mood-btn:nth-child(1){animation-delay:.04s}.mood-btn:nth-child(2){animation-delay:.08s}
+    .mood-btn:nth-child(3){animation-delay:.12s}.mood-btn:nth-child(4){animation-delay:.16s}
+    .mood-btn:nth-child(5){animation-delay:.20s}.mood-btn:nth-child(6){animation-delay:.24s}
+    .mood-btn:nth-child(7){animation-delay:.28s}.mood-btn:nth-child(8){animation-delay:.32s}
+
+    /* ── Result ── */
+    #screen-result { display: none; }
+    .result-emoji {
+      font-size: 5rem;
+      text-align: center;
+      line-height: 1;
+      margin-bottom: 1rem;
+      display: block;
+      animation: pop-in .55s cubic-bezier(.17,.67,.35,1.3) both;
+    }
+    .result-emoji.spinning { animation: slot-spin .1s linear infinite; }
+    .result-mood-label {
+      text-align: center;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: .55rem;
+      animation: fade-up .35s .12s ease both;
+    }
+    .result-desc {
+      text-align: center;
+      font-size: .97rem;
+      line-height: 1.68;
+      color: var(--text);
+      animation: fade-up .35s .22s ease both;
+    }
+    .result-date {
+      text-align: center;
+      font-size: .76rem;
+      color: var(--text-muted);
+      margin-top: .9rem;
+      animation: fade-up .35s .32s ease both;
+    }
+    .result-actions {
+      display: flex;
+      gap: .55rem;
+      justify-content: center;
+      margin-top: 1.2rem;
+      flex-wrap: wrap;
+      animation: fade-up .35s .4s ease both;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: .84rem;
+      font-family: var(--font);
+      font-weight: 500;
+      padding: .48rem .95rem;
+      transition: border-color .12s, color .12s, background .12s;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--text); }
+    .btn-randomize { border-color: var(--accent); color: var(--accent); }
+    .btn-randomize:hover { background: var(--accent-dim); }
+    .btn-randomize:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* ── History ── */
+    #section-history { display: none; animation: fade-up .4s .1s ease both; }
+    #section-history h2 {
+      font-size: .73rem;
+      font-weight: 700;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: .9rem;
+    }
+    .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 5px; }
+    .cal-day {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      animation: stagger .3s ease both;
+      animation-delay: calc(var(--i,0) * 14ms);
+    }
+    .cal-day.is-today { border-color: var(--accent); }
+    .cal-day .cal-emoji { font-size: 1.2rem; line-height: 1; }
+    .cal-day .cal-num { font-size:.57rem; font-weight:600; color:var(--text-dim); margin-top:2px; font-family:var(--font); }
+    .cal-day.has-entry .cal-num { color: var(--text-muted); }
+    .cal-day[data-tip]:hover::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 5px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--text);
+      font-size: .68rem;
+      white-space: nowrap;
+      padding: 3px 7px;
+      z-index: 10;
+      pointer-events: none;
+      font-family: var(--font);
+      font-weight: 500;
+    }
+
+    /* ── Theme overlay ── */
+    #theme-overlay {
+      position: fixed; inset: 0; pointer-events: none; z-index: 500;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 7rem; line-height: 1; opacity: 0;
+    }
+    #theme-overlay.active { animation: overlay-pop .52s ease forwards; }
+
+    /* ── Easter egg ── */
+    #easter-egg {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.8); z-index: 300;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    #easter-egg.active { display: flex; }
+    .easter-inner {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.25rem 1.75rem;
+      max-width: 360px; width: 90%;
+      text-align: center;
+      animation: bounce-in .45s ease both;
+    }
+    .easter-emoji { font-size: 3.5rem; display: block; margin-bottom: .9rem; animation: shake .6s .1s ease both; }
+    .easter-inner h2 { font-size: 1rem; font-weight: 800; letter-spacing: -.02em; color: var(--accent); margin-bottom: .65rem; }
+    .easter-inner p  { font-size: .87rem; line-height: 1.65; color: var(--text-muted); }
+    .easter-close { margin-top: 1.4rem; }
+
+    /* ── Footer ── */
+    .site-footer {
+      margin-top: .5rem;
+      font-size: .75rem;
+      color: var(--text-dim);
+      text-align: center;
+      font-weight: 400;
+    }
+    .site-footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color .12s;
+    }
+    .site-footer a:hover { color: var(--accent); }
+
+    @media (max-width: 400px) {
+      .mood-grid { grid-template-columns: repeat(2,1fr); }
+      .cal-grid { gap: 3px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="theme-overlay"></div>
+
+<div id="easter-egg" role="dialog" aria-modal="true">
+  <div class="easter-inner">
+    <span class="easter-emoji" id="easter-emoji"></span>
+    <h2 id="easter-title"></h2>
+    <p id="easter-desc"></p>
+    <button class="btn easter-close" id="easter-close"></button>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <button class="ctrl-btn" id="lang-toggle" aria-label="Change language">ES</button>
+
+    <div class="logo" id="logo">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <line x1="17" y1="1.5"  x2="17" y2="5.5"  stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="17" y1="28.5" x2="17" y2="32.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="1.5"  y1="17" x2="5.5"  y2="17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="28.5" y1="17" x2="32.5" y2="17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="4.8"  y1="4.8"  x2="7.6"  y2="7.6"  stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="26.4" y1="26.4" x2="29.2" y2="29.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="29.2" y1="4.8"  x2="26.4" y2="7.6"  stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="7.6"  y1="26.4" x2="4.8"  y2="29.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="17" cy="17" r="8.5" stroke="currentColor" stroke-width="1.6"/>
+        <circle cx="17" cy="17" r="8.5" fill="currentColor" opacity=".08"/>
+        <circle cx="14.2" cy="15.5" r="1.15" fill="currentColor"/>
+        <circle cx="19.8" cy="15.5" r="1.15" fill="currentColor"/>
+        <path d="M13.5 19.5 Q17 22.5 20.5 19.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+
+    <h1 id="site-title">emoji del día</h1>
+    <button class="ctrl-btn" id="theme-toggle" aria-label="Toggle theme">☀️</button>
+  </div>
+  <p id="subtitle"></p>
+</header>
+
+<div class="card" id="screen-selector">
+  <p class="question" id="question"></p>
+  <div class="mood-grid" id="mood-grid"></div>
+</div>
+
+<div class="card" id="screen-result">
+  <span class="result-emoji" id="res-emoji"></span>
+  <div class="result-mood-label" id="res-mood"></div>
+  <p class="result-desc" id="res-desc"></p>
+  <p class="result-date" id="res-date"></p>
+  <div class="result-actions">
+    <button class="btn btn-randomize" id="btn-randomize"></button>
+    <button class="btn" id="btn-reset"></button>
+  </div>
+</div>
+
+<div class="card" id="section-history">
+  <h2 id="historial-title"></h2>
+  <div class="cal-grid" id="cal-grid"></div>
+</div>
+
+<script>
+// ── Language data ──────────────────────────────────────────────────────────
+const LANG_LIST = ['es', 'en', 'pt'];
+const LANG_META = {
+  es: { htmlLang: 'es',    locale: 'es-ES' },
+  en: { htmlLang: 'en',    locale: 'en-US' },
+  pt: { htmlLang: 'pt-BR', locale: 'pt-BR' },
+};
+
+const UI = {
+  es: {
+    title:        'emoji del día',
+    subtitle:     'Un diagnóstico emocional de dudosa precisión',
+    question:     '¿Cómo te sientes hoy?',
+    historial:    'Tu historial',
+    randomize:    '🎲 Randomizar',
+    changeHumor:  '← Cambiar humor',
+    alreadyLogged:'Ya registraste hoy — esto es lo que te tocó.',
+    registeredOn: 'Registrado el',
+    closeEaster:  'Cerrar esto inmediatamente',
+    logoTitle:    'haz clic varias veces… si te atreves',
+    moods: { feliz:'Feliz', cansado:'Cansado', estresado:'Estresado', motivado:'Motivado', caotico:'Caótico', misterioso:'Misterioso', hambriento:'Hambriento', filosofico:'Filosófico' },
+    easter: [
+      { emoji:'👁️', title:'¡TE ESTÁBAMOS ESPERANDO!',   desc:'Sabíamos que eventualmente llegarías aquí. Todos los usuarios con demasiado tiempo libre terminan haciendo clic siete veces. Tu diagnóstico real: curiosidad patológica con tendencia a ignorar advertencias implícitas. Bienvenido al club.' },
+      { emoji:'🚨', title:'ALERTA DE PROCRASTINACIÓN',   desc:'Llevas suficiente tiempo en esta app como para encontrar secretos ocultos. Tu lista de pendientes te mira con decepción desde otra pestaña. Diagnóstico clínico: deberías estar haciendo otra cosa.' },
+      { emoji:'🤌', title:'MODO EXPERTO DESBLOQUEADO',   desc:'Felicitaciones. Encontraste el easter egg más inútil de la historia del desarrollo web. No hay premio. No hay función especial. Solo este mensaje y la satisfacción de ser el tipo de persona que hace clic siete veces.' },
+      { emoji:'🧠', title:'DIAGNÓSTICO SECRETO',         desc:'Según nuestro análisis profundo: tienes mucha curiosidad, poca tolerancia a las instrucciones y probablemente tampoco lees los términos y condiciones. Todo correcto.' },
+    ],
+  },
+  en: {
+    title:        'emoji of the day',
+    subtitle:     'An emotional diagnosis of questionable accuracy',
+    question:     'How are you feeling today?',
+    historial:    'Your history',
+    randomize:    '🎲 Randomize',
+    changeHumor:  '← Change mood',
+    alreadyLogged:"You already logged today — this is what you got.",
+    registeredOn: 'Logged on',
+    closeEaster:  'Close this immediately',
+    logoTitle:    'click several times… if you dare',
+    moods: { feliz:'Happy', cansado:'Tired', estresado:'Stressed', motivado:'Motivated', caotico:'Chaotic', misterioso:'Mysterious', hambriento:'Hungry', filosofico:'Philosophical' },
+    easter: [
+      { emoji:'👁️', title:'WE WERE EXPECTING YOU!',     desc:"We knew you'd end up here eventually. Every user with too much free time clicks seven times. Your actual diagnosis: pathological curiosity with a tendency to ignore implicit warnings. Welcome to the club." },
+      { emoji:'🚨', title:'PROCRASTINATION ALERT',       desc:"You've spent enough time in this app to uncover hidden secrets. Your to-do list is staring at you with disappointment from another tab. Clinical diagnosis: you should be doing something else right now." },
+      { emoji:'🤌', title:'EXPERT MODE UNLOCKED',        desc:"Congratulations. You found the most useless easter egg in web development history. No prize. No special feature. Just this message and the satisfaction of knowing you're the kind of person who clicks seven times." },
+      { emoji:'🧠', title:'SECRET DIAGNOSIS',            desc:"Based on our in-depth analysis (the click count): you're very curious, have low tolerance for implicit instructions, and probably don't read terms and conditions either. Everything checks out." },
+    ],
+  },
+  pt: {
+    title:        'emoji do dia',
+    subtitle:     'Um diagnóstico emocional de duvidosa precisão',
+    question:     'Como você está se sentindo hoje?',
+    historial:    'Seu histórico',
+    randomize:    '🎲 Randomizar',
+    changeHumor:  '← Mudar humor',
+    alreadyLogged:'Você já registrou hoje — é isso que te coube.',
+    registeredOn: 'Registrado em',
+    closeEaster:  'Fechar isso imediatamente',
+    logoTitle:    'clique várias vezes… se tiver coragem',
+    moods: { feliz:'Feliz', cansado:'Cansado', estresado:'Estressado', motivado:'Motivado', caotico:'Caótico', misterioso:'Misterioso', hambriento:'Faminto', filosofico:'Filosófico' },
+    easter: [
+      { emoji:'👁️', title:'ESTÁVAMOS TE ESPERANDO!',    desc:'Sabíamos que você chegaria aqui eventualmente. Todo usuário com tempo livre demais acaba clicando sete vezes. Diagnóstico real: curiosidade patológica com tendência a ignorar avisos implícitos. Bem-vindo ao clube.' },
+      { emoji:'🚨', title:'ALERTA DE PROCRASTINAÇÃO',    desc:'Você passou tempo suficiente nesse app para encontrar segredos escondidos. Sua lista de tarefas está te olhando com decepção de outra aba. Diagnóstico clínico: você deveria estar fazendo outra coisa.' },
+      { emoji:'🤌', title:'MODO ESPECIALISTA DESBLOQUEADO', desc:'Parabéns. Você encontrou o easter egg mais inútil da história do desenvolvimento web. Sem prêmio. Sem função especial. Só essa mensagem e a satisfação de saber que você é o tipo de pessoa que clica sete vezes.' },
+      { emoji:'🧠', title:'DIAGNÓSTICO SECRETO',         desc:'Com base na nossa análise profunda (o número de cliques): você tem muita curiosidade, pouca tolerância a instruções implícitas e provavelmente também não lê os termos e condições. Tudo certo.' },
+    ],
+  },
+};
+
+// ── Mood pool ─────────────────────────────────────────────────────────────
+// Emojis are shared across languages — same index = same emoji
+const MOOD_IDS   = ['feliz','cansado','estresado','motivado','caotico','misterioso','hambriento','filosofico'];
+const MOOD_ICONS = { feliz:'😊', cansado:'😴', estresado:'😤', motivado:'💪', caotico:'🌀', misterioso:'🕵️', hambriento:'🍕', filosofico:'🤔' };
+
+const EMOJIS = {
+  feliz:      ['🌈','🎉','🌻','🦋','☀️'],
+  cansado:    ['☕','🛌','🐢','🧟','🌙'],
+  estresado:  ['🔥','⚡','🌪️','🤯','😵'],
+  motivado:   ['🚀','💡','🏋️','⚡','🎯'],
+  caotico:    ['🌀','🎲','🤹','🃏','💥'],
+  misterioso: ['🌑','🦉','🔮','🗝️','🌫️'],
+  hambriento: ['🍕','🌮','🍜','🥐','🍣'],
+  filosofico: ['🤔','📚','🌌','🪬','💭'],
+};
+
+const DESCS = {
+  es: {
+    feliz:      ['Estás tan feliz que probablemente le sonreíste al microondas esta mañana. Aprovecha antes de que pase algo.','Tu nivel de alegría es estadísticamente sospechoso. ¿Qué sabes tú que los demás no?','Hoy irradias positividad. La gente en el metro te mirará raro por ir sonriendo sin razón aparente.','Tan contento que hasta el lunes te pareció aceptable. Eso es preocupante, pero en el buen sentido.','Feliz como lombriz. Sin más contexto. Las lombrices no tienen problemas de verdad.'],
+    cansado:    ['El café ya no es una bebida, es un grupo de apoyo emocional que te cabe en una taza.','Llevas despierto demasiado tiempo. Tu cerebro está subcontratando tareas a partes que no deberían pensar.','Tu velocidad operativa hoy es comparable a la de una tortuga con sueño. Y lo entendemos completamente.','Técnicamente estás en pie. Biológicamente es debatible. Felicitaciones por haberte levantado.','El cansancio ya trascendió lo físico. Estás cansado a nivel espiritual, existencial y también de lumbar.'],
+    estresado:  ['Todo está en llamas, tú también, y aun así seguiste abriendo esta app. Eso es fortaleza o negación. Probablemente las dos.','Tu sistema nervioso está mandando emails urgentes a todos tus órganos. Considera poner un límite de velocidad.','Eres el ojo del huracán, excepto que tú eres también el huracán. Y la ciudad que destruye.','El estrés ya llegó a un nivel artístico. Deberías enmarcarlo y venderlo en una galería.','Respira. No porque resuelva algo, sino porque si no lo haces empeora. Empieza por ahí.'],
+    motivado:   ['Hoy tienes energía para hacer tres cosas de tu lista de diez. Y eso ya es una victoria enorme.','Tu motivación llegó a tiempo, lo cual es inusual y merece reconocimiento. Úsala antes de que se vaya sin avisar.','Energía al 100%. Aprovecha que esto dura aproximadamente hasta las 2 de la tarde; después no garantizamos nada.','Modo bestia activado. Recuerda hidratarte. Los héroes también necesitan agua.','Foco total. Objetivos claros. Lista de tareas intimidada. Hoy es tu día y el universo lo sabe.'],
+    caotico:    ['Tienes siete pestañas abiertas, dos planes contradictorios y la confianza de alguien que no ha revisado el calendario.','El caos es tu lenguaje de amor y hoy lo estás hablando con mucha fluidez. Para bien o para mal, avanzas.','Malabares emocionales con objetos en llamas. Clásico. Aun así, aquí sigues.','Tu día es una secuencia de eventos que ningún algoritmo podría predecir. Ni tú mismo.','El caos organizado es una filosofía de vida perfectamente válida. Esto es más caos que organizado, pero no juzgamos.'],
+    misterioso: ['Hoy operas en modo sigiloso. Nadie sabe qué piensas y tú tampoco estás del todo seguro. Perfecto.','Observas mucho, dices poco y probablemente ya tienes una teoría sobre todos en la sala. Respetamos eso.','Energía de persona que sabe cosas que no va a compartir. Inquietante para los demás, muy cómodo para ti.','Cargas secretos que nadie te preguntó pero que igual te interesan a ti. Eso es tener personalidad.','Presente pero vago, como una contraseña que olvidaste pero sabes que existe. El misterio es el mensaje.'],
+    hambriento: ['Tu estado emocional puede resolverse completamente con comida. Eso no es un defecto, es eficiencia.','El hambre ya alcanzó un nivel filosófico. Ya no es que tengas hambre; es que el hambre te tiene a ti.','Tu cuerpo mandó una queja formal. El estómago está redactando un comunicado de prensa.','Hambriento y ligeramente resentido con cualquiera que ya haya comido hoy. Es una respuesta comprensible.','Tu cerebro está procesando el 60% de su capacidad pensando en qué comer. Honestamente, prioridades correctas.'],
+    filosofico: ['Hoy preguntas cosas para las que no existen respuestas y aun así sigues preguntando. Bienvenido a la filosofía.','Llevas demasiado tiempo pensando en por qué las cosas son como son. Spoiler: nadie sabe. Nadie.','Perspectiva cósmica activada. Todo parece pequeño y grande al mismo tiempo. Eso es progreso o vértigo existencial.','Hoy cuestionas el sistema, los convenios sociales y si el café ya estaba frío cuando lo serviste.','El pensamiento profundo te encontró. O tú lo buscaste. O quizás no hay diferencia. Ves a lo que nos referimos.'],
+  },
+  en: {
+    feliz:      ["You're so happy you probably smiled at the microwave this morning. Enjoy it before something ruins it.","Your joy level is statistically suspicious. What do you know that the rest of us don't?","Today you radiate positivity. People will stare at you on public transit for smiling at nothing.","So content that even Monday seemed acceptable. Concerning — but in the best possible way.","Happy as a clam. No further context. Clams don't have real problems."],
+    cansado:    ["Coffee is no longer a drink. It's an emotional support system that happens to fit in a mug.","You've been awake too long. Your brain is outsourcing cognitive tasks to parts that shouldn't be thinking.","Today's operational speed: sleepy tortoise. Completely understood. No further questions.","Technically upright. Biologically debatable. Congratulations on leaving your bed.","The exhaustion has transcended the physical. You're tired at a spiritual, existential, and lumbar level."],
+    estresado:  ["Everything is on fire, including you, and yet you still opened this app. That's either strength or denial. Probably both.","Your nervous system is sending urgent emails to all your organs. Consider implementing a rate limit.","You're the eye of the hurricane — except you're also the hurricane. And the city it destroys.","The stress has reached an artistic level. You should frame it and sell it in a gallery.","Breathe. Not because it fixes anything — but not breathing makes it worse. Start there."],
+    motivado:   ["Today you have enough energy to do three things from your list of ten. Already a massive win.","Your motivation showed up on time, which is rare and deserves recognition. Use it before it leaves without warning.","100% energy. Note: this typically lasts until about 2 PM — after that, no guarantees.","Beast mode activated. Remember to hydrate. Even heroes need water.","Total focus. Clear goals. To-do list intimidated. The universe knows today is yours."],
+    caotico:    ["You have seven tabs open, two contradictory plans, and the confidence of someone who hasn't checked their calendar.","Chaos is your love language, and today you're speaking it fluently. For better or worse, you're moving.","Emotional juggling with objects actively on fire. Classic. And yet, here you are.","Your day is a sequence of events no algorithm could predict. Including yours.","Organized chaos is a perfectly valid life philosophy. This leans more chaos than organized — but no judgment."],
+    misterioso: ["Today you operate in stealth mode. Nobody knows what you're thinking — and neither do you, fully. Perfect.","You observe a lot, say little, and have probably already formed a theory about everyone in the room.","Energy of someone who knows things they won't share. Unsettling for others, very comfortable for you.","You carry secrets nobody asked about but that you find interesting anyway. That's called having a personality.","Present but vague, like a password you forgot but know exists somewhere. The mystery is the message."],
+    hambriento: ["Your current emotional state can be fully resolved with food. That's not a flaw — it's efficiency.","The hunger has reached a philosophical level. It's not that you have hunger — hunger has you.","Your body filed a formal complaint. Your stomach is currently drafting a press release.","Hungry and mildly resentful of anyone who's already eaten today. A completely understandable reaction.","Your brain is running 60% of its capacity thinking about what to eat. Honestly, correct priorities."],
+    filosofico: ["Today you ask questions with no answers and keep asking anyway. Welcome to philosophy — you'll hate it here.","You've spent too long wondering why things are the way they are. Spoiler: nobody knows. Not even them.","Cosmic perspective activated. Everything feels small and vast at once. That's either progress or vertigo.","Today you question the system, social conventions, and whether your coffee was already cold when poured.","Deep thought found you. Or you found it. Or maybe there's no difference. You see what we mean."],
+  },
+  pt: {
+    feliz:      ['Você está tão feliz que provavelmente sorriu para o micro-ondas hoje cedo. Aproveite antes que algo estrague.','Seu nível de alegria é estatisticamente suspeito. O que você sabe que os outros não sabem?','Hoje você irradia positividade. As pessoas vão te olhar estranhamente no ônibus por sorrir à toa.','Tão contente que até segunda-feira pareceu aceitável. Preocupante, mas no bom sentido.','Feliz como uma minhoca. Sem mais contexto. Minhocas não têm problemas de verdade.'],
+    cansado:    ['O café não é mais uma bebida. É um sistema de suporte emocional que cabe numa xícara.','Você ficou acordado tempo demais. Seu cérebro está terceirizando tarefas para partes que não deveriam pensar.','Velocidade operacional de hoje: tartaruga com sono. Entendemos completamente. Sem mais perguntas.','Tecnicamente de pé. Biologicamente discutível. Parabéns por ter saído da cama.','O cansaço transcendeu o físico. Você está cansado no nível espiritual, existencial e também lombar.'],
+    estresado:  ['Tudo está em chamas, você também, e ainda assim abriu esse app. Isso é força ou negação. Provavelmente os dois.','Seu sistema nervoso está mandando e-mails urgentes para todos os seus órgãos. Considere um limite de velocidade.','Você é o olho do furacão — exceto que também é o furacão. E a cidade que ele destrói.','O estresse chegou a um nível artístico. Você deveria emoldurar e vender numa galeria.','Respira. Não porque resolve — mas não respirar piora tudo. Começa por aí.'],
+    motivado:   ['Hoje você tem energia para fazer três coisas da sua lista de dez. Isso já é uma vitória enorme.','Sua motivação apareceu no horário, o que é raro e merece reconhecimento. Use antes que suma sem avisar.','Energia no máximo. Atenção: costuma durar até por volta das 14h — depois não garantimos nada.','Modo fera ativado. Lembre de se hidratar. Até heróis precisam de água.','Foco total. Objetivos claros. Lista de tarefas intimidada. O universo sabe que hoje é seu dia.'],
+    caotico:    ['Você tem sete abas abertas, dois planos contraditórios e a confiança de quem não olhou a agenda.','O caos é sua linguagem do amor e hoje você está falando fluentemente. Para o bem ou para o mal, você avança.','Malabarismo emocional com objetos em chamas. Clássico. E ainda assim, aqui você está.','Seu dia é uma sequência de eventos que nenhum algoritmo poderia prever. Nem você mesmo.','O caos organizado é uma filosofia de vida perfeitamente válida. Isso está mais para caos do que organizado — mas sem julgamentos.'],
+    misterioso: ['Hoje você opera em modo furtivo. Ninguém sabe o que você pensa — e você também não tem tanta certeza. Perfeito.','Você observa muito, fala pouco e provavelmente já tem uma teoria sobre todos na sala.','Energia de quem sabe coisas e não vai compartilhar. Inquietante para os outros, muito confortável para você.','Você carrega segredos que ninguém pediu mas que acha interessante de qualquer jeito. Isso se chama ter personalidade.','Presente mas vago, como uma senha que você esqueceu mas sabe que existe em algum lugar. O mistério é a mensagem.'],
+    hambriento: ['Seu estado emocional pode ser completamente resolvido com comida. Isso não é defeito — é eficiência.','A fome atingiu um nível filosófico. Não é que você tem fome — a fome te tem.','Seu corpo fez uma reclamação formal. O estômago está redigindo um comunicado de imprensa.','Com fome e levemente ressentido com quem já comeu hoje. Uma reação completamente compreensível.','Seu cérebro está operando com 60% da capacidade pensando no que comer. Honestamente, prioridades corretas.'],
+    filosofico: ['Hoje você faz perguntas sem resposta e continua perguntando assim mesmo. Bem-vindo à filosofia — você vai odiar aqui.','Você passou tempo demais tentando entender por que as coisas são como são. Spoiler: ninguém sabe. Nem eles.','Perspectiva cósmica ativada. Tudo parece pequeno e vasto ao mesmo tempo. Isso é progresso ou vertigem.','Hoje você questiona o sistema, as convenções sociais e se o café já estava frio quando foi servido.','O pensamento profundo te encontrou. Ou você o encontrou. Ou talvez não haja diferença. Você já entendeu.'],
+  },
+};
+
+// ── Utilities ──────────────────────────────────────────────────────────────
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function seededRandom(seed) {
+  let s = seed;
+  return () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+}
+function pickForDay(moodId, dateStr) {
+  const seed = [...dateStr].reduce((a,c) => isNaN(c) ? a : a*10 + +c, 0);
+  const rng  = seededRandom(seed + moodId.length * 37);
+  return Math.floor(rng() * EMOJIS[moodId].length);
+}
+function getEntry(moodId, idx) {
+  return { emoji: EMOJIS[moodId][idx], desc: DESCS[currentLang][moodId][idx] };
+}
+function formatDate(dateStr) {
+  const [y,m,d] = dateStr.split('-').map(Number);
+  return new Date(y,m-1,d).toLocaleDateString(LANG_META[currentLang].locale, { weekday:'short', day:'numeric', month:'short' });
+}
+
+// ── Storage ────────────────────────────────────────────────────────────────
+const LS_KEY   = 'emojiday_v2';
+const LS_THEME = 'emojiday_theme';
+const LS_LANG  = 'emojiday_lang';
+function loadHistory() { try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch { return {}; } }
+function saveEntry(dateStr, moodId, idx) {
+  const h = loadHistory();
+  h[dateStr] = { moodId, idx };
+  localStorage.setItem(LS_KEY, JSON.stringify(h));
+}
+
+// ── Theme ──────────────────────────────────────────────────────────────────
+let currentTheme = localStorage.getItem(LS_THEME) || 'dark';
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('theme-toggle').textContent = t === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem(LS_THEME, t);
+  currentTheme = t;
+}
+function toggleTheme() {
+  const next    = currentTheme === 'dark' ? 'light' : 'dark';
+  const overlay = document.getElementById('theme-overlay');
+  overlay.textContent = next === 'light' ? '🌞' : '🌚';
+  overlay.classList.remove('active');
+  void overlay.offsetWidth;
+  overlay.classList.add('active');
+  overlay.addEventListener('animationend', () => overlay.classList.remove('active'), { once: true });
+  if ('startViewTransition' in document) {
+    document.startViewTransition(() => applyTheme(next));
+  } else {
+    applyTheme(next);
+  }
+}
+
+// ── Language ───────────────────────────────────────────────────────────────
+let currentLang = localStorage.getItem(LS_LANG) || 'es';
+
+function applyLang(lang) {
+  currentLang = lang;
+  localStorage.setItem(LS_LANG, lang);
+  const t = UI[lang];
+  document.documentElement.lang = LANG_META[lang].htmlLang;
+  document.title = t.title;
+  document.getElementById('site-title').textContent  = t.title;
+  document.getElementById('subtitle').textContent    = t.subtitle;
+  document.getElementById('question').textContent    = t.question;
+  document.getElementById('historial-title').textContent = t.historial;
+  document.getElementById('btn-randomize').textContent   = t.randomize;
+  document.getElementById('btn-reset').textContent       = t.changeHumor;
+  document.getElementById('easter-close').textContent    = t.closeEaster;
+  document.getElementById('lang-toggle').textContent     = lang.toUpperCase();
+  document.getElementById('logo').title = t.logoTitle;
+
+  // Update mood button labels
+  document.querySelectorAll('.mood-btn').forEach(btn => {
+    const moodId = btn.dataset.mood;
+    btn.querySelector('.mood-label').textContent = t.moods[moodId];
+  });
+
+  // Update result if visible
+  if (activeMoodId && document.getElementById('screen-result').style.display !== 'none') {
+    const idx = currentEntryIdx ?? pickForDay(activeMoodId, todayKey());
+    const entry = getEntry(activeMoodId, idx);
+    document.getElementById('res-mood').textContent = t.moods[activeMoodId].toUpperCase();
+    document.getElementById('res-desc').textContent = entry.desc;
+    const stored = loadHistory()[todayKey()];
+    document.getElementById('res-date').textContent = stored
+      ? t.alreadyLogged
+      : t.registeredOn + ' ' + formatDate(todayKey());
+  }
+
+  // Update calendar tooltips
+  document.querySelectorAll('.cal-day[data-tip]').forEach(cell => {
+    const moodId = cell.dataset.mood;
+    if (moodId) cell.setAttribute('data-tip', t.moods[moodId]);
+  });
+}
+
+function cycleLang() {
+  const next = LANG_LIST[(LANG_LIST.indexOf(currentLang) + 1) % LANG_LIST.length];
+  if ('startViewTransition' in document) {
+    document.startViewTransition(() => applyLang(next));
+  } else {
+    applyLang(next);
+  }
+}
+
+// ── DOM refs ───────────────────────────────────────────────────────────────
+const screenSelector = document.getElementById('screen-selector');
+const screenResult   = document.getElementById('screen-result');
+const sectionHistory = document.getElementById('section-history');
+const moodGridEl     = document.getElementById('mood-grid');
+const calGridEl      = document.getElementById('cal-grid');
+const resEmoji       = document.getElementById('res-emoji');
+const resMood        = document.getElementById('res-mood');
+const resDesc        = document.getElementById('res-desc');
+const resDate        = document.getElementById('res-date');
+
+// ── State ──────────────────────────────────────────────────────────────────
+let activeMoodId    = null;
+let currentEntryIdx = null;
+
+// ── Render ─────────────────────────────────────────────────────────────────
+function renderMoodButtons() {
+  moodGridEl.innerHTML = '';
+  MOOD_IDS.forEach(id => {
+    const btn = document.createElement('button');
+    btn.className   = 'mood-btn';
+    btn.dataset.mood = id;
+    btn.innerHTML   = `<span class="mood-icon">${MOOD_ICONS[id]}</span><span class="mood-label">${UI[currentLang].moods[id]}</span>`;
+    btn.addEventListener('click', () => onMoodSelected(id));
+    moodGridEl.appendChild(btn);
+  });
+}
+
+function reAnimate(el) { el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; }
+
+function showResult(moodId, idx, alreadyLogged = false) {
+  activeMoodId    = moodId;
+  currentEntryIdx = idx;
+  const t     = UI[currentLang];
+  const entry = getEntry(moodId, idx);
+
+  screenSelector.style.display = 'none';
+  screenResult.style.display   = 'block';
+  [resEmoji, resMood, resDesc, resDate].forEach(reAnimate);
+
+  resEmoji.textContent = entry.emoji;
+  resMood.textContent  = t.moods[moodId].toUpperCase();
+  resDesc.textContent  = entry.desc;
+  resDate.textContent  = alreadyLogged
+    ? t.alreadyLogged
+    : t.registeredOn + ' ' + formatDate(todayKey());
+}
+
+function renderCalendar() {
+  const history  = loadHistory();
+  const today    = new Date();
+  const todayStr = dateKey(today);
+  calGridEl.innerHTML = '';
+
+  for (let i = 29; i >= 0; i--) {
+    const d   = new Date(today);
+    d.setDate(d.getDate() - i);
+    const key   = dateKey(d);
+    const entry = history[key];
+    const cell  = document.createElement('div');
+
+    cell.className = 'cal-day' + (entry ? ' has-entry' : '') + (key === todayStr ? ' is-today' : '');
+    cell.style.setProperty('--i', 29 - i);
+
+    if (entry) {
+      const emoji = EMOJIS[entry.moodId]?.[entry.idx] ?? '?';
+      cell.innerHTML = `<span class="cal-emoji">${emoji}</span><span class="cal-num">${d.getDate()}</span>`;
+      cell.dataset.tip  = UI[currentLang].moods[entry.moodId] ?? entry.moodId;
+      cell.dataset.mood = entry.moodId;
+    } else {
+      cell.innerHTML = `<span class="cal-num">${d.getDate()}</span>`;
+    }
+    calGridEl.appendChild(cell);
+  }
+  sectionHistory.style.display = 'block';
+}
+
+// ── Randomizer ─────────────────────────────────────────────────────────────
+function animateRandomize(moodId) {
+  const btn = document.getElementById('btn-randomize');
+  btn.disabled = true;
+  let ticks = 0;
+  const pool = EMOJIS[moodId];
+  resEmoji.classList.add('spinning');
+  const iv = setInterval(() => {
+    resEmoji.textContent = pool[Math.floor(Math.random() * pool.length)];
+    ticks++;
+    if (ticks >= 16) {
+      clearInterval(iv);
+      resEmoji.classList.remove('spinning');
+      const idx    = Math.floor(Math.random() * pool.length);
+      const entry  = getEntry(moodId, idx);
+      currentEntryIdx      = idx;
+      resEmoji.textContent = entry.emoji;
+      resDesc.textContent  = entry.desc;
+      reAnimate(resEmoji);
+      saveEntry(todayKey(), moodId, idx);
+      btn.disabled = false;
+    }
+  }, 75);
+}
+
+// ── Easter egg ─────────────────────────────────────────────────────────────
+const easterEl = document.getElementById('easter-egg');
+let logoClicks = 0, logoTimer = null;
+
+function triggerEasterEgg() {
+  const eggs = UI[currentLang].easter;
+  const egg  = eggs[Math.floor(Math.random() * eggs.length)];
+  document.getElementById('easter-emoji').textContent = egg.emoji;
+  document.getElementById('easter-title').textContent = egg.title;
+  document.getElementById('easter-desc').textContent  = egg.desc;
+  const inner = easterEl.querySelector('.easter-inner');
+  reAnimate(inner);
+  reAnimate(easterEl.querySelector('.easter-emoji'));
+  easterEl.classList.add('active');
+}
+function closeEaster() { easterEl.classList.remove('active'); }
+
+// ── Events ─────────────────────────────────────────────────────────────────
+function onMoodSelected(moodId) {
+  const idx = pickForDay(moodId, todayKey());
+  saveEntry(todayKey(), moodId, idx);
+  showResult(moodId, idx, false);
+  renderCalendar();
+}
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+  screenResult.style.display   = 'none';
+  screenSelector.style.display = 'block';
+  activeMoodId = null; currentEntryIdx = null;
+});
+document.getElementById('btn-randomize').addEventListener('click', () => {
+  if (activeMoodId) animateRandomize(activeMoodId);
+});
+document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+document.getElementById('lang-toggle').addEventListener('click', cycleLang);
+
+document.getElementById('logo').addEventListener('click', () => {
+  const logo = document.getElementById('logo');
+  logo.classList.remove('spinning'); void logo.offsetWidth; logo.classList.add('spinning');
+  logo.addEventListener('animationend', () => logo.classList.remove('spinning'), { once: true });
+  logoClicks++;
+  clearTimeout(logoTimer);
+  logoTimer = setTimeout(() => { logoClicks = 0; }, 1800);
+  if (logoClicks >= 7) { logoClicks = 0; triggerEasterEgg(); }
+});
+document.getElementById('easter-close').addEventListener('click', closeEaster);
+easterEl.addEventListener('click', e => { if (e.target === easterEl) closeEaster(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEaster(); });
+
+// ── Init ───────────────────────────────────────────────────────────────────
+function init() {
+  applyTheme(currentTheme);
+  renderMoodButtons();
+  applyLang(currentLang);   // sets all text after buttons exist
+
+  const history    = loadHistory();
+  const todayEntry = history[todayKey()];
+
+  if (todayEntry) {
+    showResult(todayEntry.moodId, todayEntry.idx ?? pickForDay(todayEntry.moodId, todayKey()), true);
+    renderCalendar();
+  } else {
+    screenSelector.style.display = 'block';
+    if (Object.keys(history).length > 0) renderCalendar();
+  }
+}
+
+init();
+</script>
+
+<footer class="site-footer">
+  made by <a href="https://www.hectormendoza.me/" target="_blank" rel="noopener">🌟 hector mendoza</a>
+</footer>
+</body>
+</html>
