@@ -23,5 +23,5 @@ Allow: /
 User-agent: Amazonbot
 Allow: /
 
-# Sitemap location (update with your deployed URL)
-# Sitemap: https://your-domain.com/sitemap.xml
+# Sitemap
+Sitemap: https://emoji-day-hm.vercel.app/sitemap.xml
