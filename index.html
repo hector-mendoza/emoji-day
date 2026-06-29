@@ -21,16 +21,26 @@
   <meta property="og:locale:alternate"   content="en_US">
   <meta property="og:locale:alternate"   content="pt_BR">
   <meta property="og:site_name"   content="emoji del día">
-  <!-- og:url and og:image: set these to your deployed URL -->
+  <meta property="og:url"         content="https://hector-mendoza.github.io/emoji-day/">
+  <meta property="og:image"       content="https://hector-mendoza.github.io/emoji-day/og-image.png">
+  <meta property="og:image:width"  content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt"   content="emoji del día — mood tracker with daily emoji">
 
   <!-- ── Twitter / X Card ── -->
-  <meta name="twitter:card"        content="summary">
+  <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:title"       content="emoji del día">
   <meta name="twitter:description" content="Un diagnóstico emocional de dudosa precisión. Tu emoji del día, seeded por fecha.">
+  <meta name="twitter:image"       content="https://hector-mendoza.github.io/emoji-day/og-image.png">
 
   <!-- ── GEO (Generative Engine Optimization) ── -->
   <meta name="ai-content-declaration" content="human-authored">
-  <!-- canonical: set to your deployed URL -->
+  <link rel="canonical" href="https://hector-mendoza.github.io/emoji-day/">
+  <link rel="alternate" hreflang="es" href="https://hector-mendoza.github.io/emoji-day/?lang=es">
+  <link rel="alternate" hreflang="en" href="https://hector-mendoza.github.io/emoji-day/?lang=en">
+  <link rel="alternate" hreflang="pt" href="https://hector-mendoza.github.io/emoji-day/?lang=pt">
+  <link rel="alternate" hreflang="x-default" href="https://hector-mendoza.github.io/emoji-day/">
+  <link rel="manifest" href="manifest.webmanifest">
 
   <!-- ── Structured data (WebApplication + FAQPage) ── -->
   <script type="application/ld+json">
@@ -97,7 +107,7 @@
             "name": "Does it work offline?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Yes, after the initial load. The only external dependency is the Space Grotesk font from Google Fonts. All logic runs in the browser with no network calls."
+              "text": "Yes. After the first visit the app works fully offline via a service worker. Fonts are self-hosted — no external network requests are required."
             }
           }
         ]
@@ -107,9 +117,8 @@
   </script>
 
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="fonts/space-grotesk.css">
   <style>
     :root {
       --bg: #111110;
@@ -144,6 +153,36 @@
     @keyframes vt-grow   { from { opacity:0; transform:scale(.96)  rotate(-.4deg); filter:blur(3px); } }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 1rem;
+      z-index: 1000;
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: .82rem;
+      font-weight: 600;
+      padding: .45rem .85rem;
+      text-decoration: none;
+      transition: top .15s;
+    }
+    .skip-link:focus { top: 1rem; outline: none; }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
 
     body {
       background: var(--bg);
@@ -372,6 +411,9 @@
     .cal-day .cal-emoji { font-size: 1.2rem; line-height: 1; }
     .cal-day .cal-num { font-size:.57rem; font-weight:600; color:var(--text-dim); margin-top:2px; font-family:var(--font); }
     .cal-day.has-entry .cal-num { color: var(--text-muted); }
+    .cal-day.has-entry { cursor: pointer; }
+    .cal-day.has-entry:hover,
+    .cal-day.has-entry:focus-visible { border-color: var(--accent); outline: none; }
     .cal-day[data-tip]:hover::after {
       content: attr(data-tip);
       position: absolute;
@@ -482,6 +524,67 @@
     }
     .instructions-close { display: block; margin: 1.5rem auto 0; }
 
+    /* ── Past entry modal ── */
+    #past-entry-modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.8); z-index: 300;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    #past-entry-modal.active { display: flex; }
+    .past-entry-inner {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 1.75rem;
+      max-width: 400px; width: 90%;
+      text-align: center;
+      animation: bounce-in .45s ease both;
+    }
+    .past-entry-emoji { font-size: 4rem; line-height: 1; display: block; margin-bottom: .75rem; }
+    .past-entry-mood {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: .5rem;
+    }
+    .past-entry-date { font-size: .76rem; color: var(--text-muted); margin-bottom: .85rem; }
+    .past-entry-desc { font-size: .92rem; line-height: 1.65; color: var(--text); margin-bottom: 1.25rem; }
+    .past-entry-close { margin: 0 auto; }
+
+    /* ── Data actions ── */
+    .data-actions {
+      display: flex;
+      gap: .5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: .85rem;
+    }
+    .data-actions .btn { font-size: .76rem; padding: .38rem .75rem; }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(120%);
+      opacity: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: .82rem;
+      font-weight: 500;
+      padding: .55rem 1rem;
+      z-index: 400;
+      pointer-events: none;
+      transition: transform .25s ease, opacity .25s ease;
+    }
+    #toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+
     /* ── Footer ── */
     .site-footer {
       margin-top: .5rem;
@@ -515,6 +618,10 @@
 </head>
 <body>
 
+<a class="skip-link" id="skip-link" href="#main-content">Saltar al contenido</a>
+<div id="result-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
 <div id="theme-overlay"></div>
 
 <div id="instructions-modal" role="dialog" aria-modal="true" aria-labelledby="info-title">
@@ -531,6 +638,17 @@
     <h2 id="easter-title"></h2>
     <p id="easter-desc"></p>
     <button class="btn easter-close" id="easter-close"></button>
+  </div>
+</div>
+
+<div id="past-entry-modal" role="dialog" aria-modal="true" aria-labelledby="past-entry-title">
+  <div class="past-entry-inner">
+    <h2 id="past-entry-title" class="sr-only"></h2>
+    <span class="past-entry-emoji" id="past-entry-emoji"></span>
+    <div class="past-entry-mood" id="past-entry-mood"></div>
+    <p class="past-entry-date" id="past-entry-date"></p>
+    <p class="past-entry-desc" id="past-entry-desc"></p>
+    <button class="btn past-entry-close" id="past-entry-close"></button>
   </div>
 </div>
 
@@ -563,6 +681,8 @@
   <button class="info-trigger" id="info-trigger"></button>
 </header>
 
+<main id="main-content">
+
 <div class="card" id="screen-selector">
   <p class="question" id="question"></p>
   <div class="mood-grid" id="mood-grid"></div>
@@ -575,6 +695,7 @@
   <p class="result-date" id="res-date"></p>
   <div class="result-actions">
     <button class="btn btn-randomize" id="btn-randomize"></button>
+    <button class="btn" id="btn-share"></button>
     <button class="btn" id="btn-reset"></button>
   </div>
 </div>
@@ -582,9 +703,24 @@
 <div class="card" id="section-history">
   <h2 id="historial-title"></h2>
   <div class="cal-grid" id="cal-grid" role="grid" aria-labelledby="historial-title"></div>
+  <div class="data-actions">
+    <button class="btn" id="btn-export"></button>
+    <button class="btn" id="btn-import"></button>
+    <input type="file" id="import-file" accept="application/json,.json" hidden>
+  </div>
 </div>
 
+</main>
+
 <script>
+// ── Site config ───────────────────────────────────────────────────────────
+const SITE_BASE = (() => {
+  const fallback = 'https://hector-mendoza.github.io/emoji-day';
+  if (location.protocol === 'file:' || !location.origin || location.origin === 'null') return fallback;
+  const path = location.pathname.replace(/\/index\.html$/i, '').replace(/\/$/, '') || '';
+  return location.origin + path;
+})();
+
 // ── Language data ──────────────────────────────────────────────────────────
 const LANG_LIST = ['es', 'en', 'pt'];
 const LANG_META = {
@@ -609,6 +745,15 @@ const UI = {
     langToggleLabel: 'Cambiar idioma',
     themeToggleLabel: 'Cambiar tema',
     footerMadeBy: 'hecho por',
+    share:        '📤 Compartir',
+    shareCopied:  'Copiado al portapapeles',
+    pastEntryClose: 'Cerrar',
+    exportHistory:  '⬇ Exportar historial',
+    importHistory:  '⬆ Importar historial',
+    exportDone:   'Historial exportado',
+    importDone:   'Historial importado',
+    importError:  'Archivo de historial inválido',
+    skipToMain:   'Saltar al contenido',
     metaDesc:     'Un diagnóstico emocional de dudosa precisión. Elige tu humor del día y descubre tu emoji. Historial de 30 días, sin cuentas, sin backend.',
     ogTitle:      'emoji del día — un diagnóstico emocional de dudosa precisión',
     moods: { feliz:'Feliz', cansado:'Cansado', estresado:'Estresado', motivado:'Motivado', caotico:'Caótico', misterioso:'Misterioso', hambriento:'Hambriento', filosofico:'Filosófico' },
@@ -625,7 +770,7 @@ const UI = {
         { icon: '🎭', text: 'Elige cómo te sientes hoy entre 8 opciones. No hay respuesta incorrecta.' },
         { icon: '🎯', text: 'Recibes un emoji con una descripción. El resultado está determinado por la fecha: el mismo humor el mismo día siempre da el mismo emoji.' },
         { icon: '🎲', text: 'Si no te convence, usa Randomizar para una tirada libre del pool de tu humor.' },
-        { icon: '📅', text: 'Tu historial muestra los últimos 30 días. Solo puedes registrar un humor por día.' },
+        { icon: '📅', text: 'Tu historial muestra los últimos 30 días. Toca un día con emoji para ver el detalle.' },
         { icon: '🔒', text: 'Todo se guarda en tu dispositivo (LocalStorage). Nadie más puede ver tus datos.' },
         { icon: '🌐', text: 'Cambia de idioma o tema en cualquier momento sin perder tu historial.' },
       ],
@@ -646,6 +791,15 @@ const UI = {
     langToggleLabel: 'Change language',
     themeToggleLabel: 'Toggle theme',
     footerMadeBy: 'made by',
+    share:        '📤 Share',
+    shareCopied:  'Copied to clipboard',
+    pastEntryClose: 'Close',
+    exportHistory:  '⬇ Export history',
+    importHistory:  '⬆ Import history',
+    exportDone:   'History exported',
+    importDone:   'History imported',
+    importError:  'Invalid history file',
+    skipToMain:   'Skip to main content',
     metaDesc:     'An emotional diagnosis of questionable accuracy. Pick your mood and get your emoji of the day. 30-day history, no accounts, no backend.',
     ogTitle:      'emoji of the day — an emotional diagnosis of questionable accuracy',
     moods: { feliz:'Happy', cansado:'Tired', estresado:'Stressed', motivado:'Motivated', caotico:'Chaotic', misterioso:'Mysterious', hambriento:'Hungry', filosofico:'Philosophical' },
@@ -662,7 +816,7 @@ const UI = {
         { icon: '🎭', text: 'Pick how you\'re feeling today from 8 options. There\'s no wrong answer.' },
         { icon: '🎯', text: 'You get an emoji with a description. The result is date-seeded: same mood on the same day always gives the same emoji.' },
         { icon: '🎲', text: 'Not feeling it? Hit Randomize to pull a free pick from your mood\'s pool.' },
-        { icon: '📅', text: 'Your history shows the last 30 days. Only one mood can be logged per day.' },
+        { icon: '📅', text: 'Your history shows the last 30 days. Tap a day with an emoji to view the full entry.' },
         { icon: '🔒', text: 'Everything is stored on your device (LocalStorage). Nobody else can see your data.' },
         { icon: '🌐', text: 'Switch language or theme anytime without losing your history.' },
       ],
@@ -683,6 +837,15 @@ const UI = {
     langToggleLabel: 'Mudar idioma',
     themeToggleLabel: 'Alternar tema',
     footerMadeBy: 'feito por',
+    share:        '📤 Compartilhar',
+    shareCopied:  'Copiado para a área de transferência',
+    pastEntryClose: 'Fechar',
+    exportHistory:  '⬇ Exportar histórico',
+    importHistory:  '⬆ Importar histórico',
+    exportDone:   'Histórico exportado',
+    importDone:   'Histórico importado',
+    importError:  'Arquivo de histórico inválido',
+    skipToMain:   'Pular para o conteúdo',
     metaDesc:     'Um diagnóstico emocional de duvidosa precisão. Escolha seu humor do dia e descubra seu emoji. Histórico de 30 dias, sem contas, sem backend.',
     ogTitle:      'emoji do dia — um diagnóstico emocional de duvidosa precisão',
     moods: { feliz:'Feliz', cansado:'Cansado', estresado:'Estressado', motivado:'Motivado', caotico:'Caótico', misterioso:'Misterioso', hambriento:'Faminto', filosofico:'Filosófico' },
@@ -699,7 +862,7 @@ const UI = {
         { icon: '🎭', text: 'Escolha como você está se sentindo entre 8 opções. Não há resposta errada.' },
         { icon: '🎯', text: 'Você recebe um emoji com uma descrição. O resultado é determinado pela data: o mesmo humor no mesmo dia sempre dá o mesmo emoji.' },
         { icon: '🎲', text: 'Não curtiu? Use Randomizar para uma escolha livre do pool do seu humor.' },
-        { icon: '📅', text: 'Seu histórico mostra os últimos 30 dias. Só é possível registrar um humor por dia.' },
+        { icon: '📅', text: 'Seu histórico mostra os últimos 30 dias. Toque em um dia com emoji para ver o detalhe.' },
         { icon: '🔒', text: 'Tudo fica salvo no seu dispositivo (LocalStorage). Ninguém mais pode ver seus dados.' },
         { icon: '🌐', text: 'Mude o idioma ou tema a qualquer momento sem perder seu histórico.' },
       ],
@@ -826,6 +989,9 @@ function toggleTheme() {
 
 // ── Language ───────────────────────────────────────────────────────────────
 function detectLang() {
+  const params = new URLSearchParams(location.search);
+  const urlLang = params.get('lang');
+  if (urlLang && LANG_LIST.includes(urlLang)) return urlLang;
   const stored = localStorage.getItem(LS_LANG);
   if (stored && LANG_LIST.includes(stored)) return stored;
   const prefs = navigator.languages?.length ? navigator.languages : [navigator.language || 'es'];
@@ -851,7 +1017,12 @@ function applyLang(lang) {
   document.getElementById('question').textContent    = t.question;
   document.getElementById('historial-title').textContent = t.historial;
   document.getElementById('btn-randomize').textContent   = t.randomize;
+  document.getElementById('btn-share').textContent     = t.share;
   document.getElementById('btn-reset').textContent       = t.changeHumor;
+  document.getElementById('btn-export').textContent    = t.exportHistory;
+  document.getElementById('btn-import').textContent    = t.importHistory;
+  document.getElementById('past-entry-close').textContent = t.pastEntryClose;
+  document.getElementById('skip-link').textContent     = t.skipToMain;
   document.getElementById('easter-close').textContent    = t.closeEaster;
   document.getElementById('lang-toggle').textContent     = lang.toUpperCase();
   document.getElementById('lang-toggle').setAttribute('aria-label', t.langToggleLabel);
@@ -894,8 +1065,21 @@ function applyLang(lang) {
   // Update calendar tooltips
   document.querySelectorAll('.cal-day[data-tip]').forEach(cell => {
     const moodId = cell.dataset.mood;
-    if (moodId) cell.setAttribute('data-tip', t.moods[moodId]);
+    if (moodId) {
+      const label = t.moods[moodId];
+      cell.setAttribute('data-tip', label);
+      cell.setAttribute('title', label);
+      const dateStr = cell.dataset.date;
+      if (dateStr) cell.setAttribute('aria-label', `${formatDate(dateStr)} — ${label}`);
+    }
   });
+}
+
+function announceResult(moodId, idx) {
+  const entry = getEntry(moodId, idx);
+  const t = UI[currentLang];
+  document.getElementById('result-announcer').textContent =
+    `${entry.emoji} ${t.moods[moodId]}. ${entry.desc}`;
 }
 
 function cycleLang() {
@@ -953,6 +1137,7 @@ function showResult(moodId, idx, alreadyLogged = false) {
   resDate.textContent  = alreadyLogged
     ? t.alreadyLogged
     : t.registeredOn + ' ' + formatDate(todayKey());
+  announceResult(moodId, idx);
 }
 
 function renderCalendar() {
@@ -977,9 +1162,16 @@ function renderCalendar() {
       cell.innerHTML = `<span class="cal-emoji" aria-hidden="true">${emoji}</span><span class="cal-num">${d.getDate()}</span>`;
       cell.dataset.tip  = moodLabel;
       cell.dataset.mood = entry.moodId;
+      cell.dataset.date = key;
+      cell.dataset.idx  = entry.idx;
+      cell.tabIndex = 0;
       cell.setAttribute('role', 'gridcell');
       cell.setAttribute('title', moodLabel);
       cell.setAttribute('aria-label', `${formatDate(key)} — ${moodLabel}`);
+      cell.addEventListener('click', () => openPastEntry(key, entry));
+      cell.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPastEntry(key, entry); }
+      });
     } else {
       cell.innerHTML = `<span class="cal-num">${d.getDate()}</span>`;
       cell.setAttribute('role', 'gridcell');
@@ -1010,9 +1202,104 @@ function animateRandomize(moodId) {
       resDesc.textContent  = entry.desc;
       reAnimate(resEmoji);
       saveEntry(todayKey(), moodId, idx);
+      announceResult(moodId, idx);
       btn.disabled = false;
     }
   }, 75);
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('visible'), 2400);
+}
+
+// ── Share ────────────────────────────────────────────────────────────────────
+async function shareResult() {
+  if (!activeMoodId || currentEntryIdx == null) return;
+  const entry = getEntry(activeMoodId, currentEntryIdx);
+  const t = UI[currentLang];
+  const text = `${entry.emoji} ${t.moods[activeMoodId]}\n\n${entry.desc}\n\n— ${t.title}`;
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: t.title, text });
+    } else if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      showToast(t.shareCopied);
+    }
+  } catch (err) {
+    if (err.name !== 'AbortError' && navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast(t.shareCopied);
+      } catch { /* clipboard unavailable */ }
+    }
+  }
+}
+
+// ── History export / import ────────────────────────────────────────────────
+function exportHistory() {
+  const data = JSON.stringify(loadHistory(), null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `emojiday-history-${todayKey()}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast(UI[currentLang].exportDone);
+}
+
+function importHistory(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('invalid');
+      const cleaned = {};
+      for (const [k, v] of Object.entries(parsed)) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(k) || !v?.moodId) continue;
+        if (!MOOD_IDS.includes(v.moodId)) continue;
+        const idx = Number(v.idx);
+        if (!Number.isInteger(idx) || idx < 0 || idx >= EMOJIS[v.moodId].length) continue;
+        cleaned[k] = { moodId: v.moodId, idx };
+      }
+      const merged = pruneHistory({ ...loadHistory(), ...cleaned });
+      localStorage.setItem(LS_KEY, JSON.stringify(merged));
+      showToast(UI[currentLang].importDone);
+      renderCalendar();
+      const todayEntry = merged[todayKey()];
+      if (todayEntry) {
+        showResult(todayEntry.moodId, todayEntry.idx ?? pickForDay(todayEntry.moodId, todayKey()), true);
+      }
+    } catch {
+      showToast(UI[currentLang].importError);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ── Past entry modal ─────────────────────────────────────────────────────────
+const pastEntryModal = document.getElementById('past-entry-modal');
+
+function openPastEntry(dateStr, entry) {
+  const t = UI[currentLang];
+  const { emoji, desc } = getEntry(entry.moodId, entry.idx);
+  document.getElementById('past-entry-title').textContent = formatDate(dateStr);
+  document.getElementById('past-entry-emoji').textContent = emoji;
+  document.getElementById('past-entry-mood').textContent  = t.moods[entry.moodId].toUpperCase();
+  document.getElementById('past-entry-date').textContent  = formatDate(dateStr);
+  document.getElementById('past-entry-desc').textContent = desc;
+  openModal(pastEntryModal);
+}
+
+function closePastEntry() {
+  if (!pastEntryModal.classList.contains('active')) return;
+  pastEntryModal.classList.remove('active');
+  modalReturnFocus();
 }
 
 // ── Easter egg ─────────────────────────────────────────────────────────────
@@ -1029,7 +1316,7 @@ function triggerEasterEgg() {
   reAnimate(inner);
   reAnimate(easterEl.querySelector('.easter-emoji'));
   easterEl.classList.add('active');
-  modalFocus(easterEl);
+  openModal(easterEl);
 }
 function closeEaster() {
   if (!easterEl.classList.contains('active')) return;
@@ -1039,14 +1326,44 @@ function closeEaster() {
 
 // ── Modal focus ────────────────────────────────────────────────────────────
 let modalReturnEl = null;
+let activeModal = null;
+
 function modalFocus(modal) {
   modalReturnEl = document.activeElement;
+  activeModal = modal;
   const focusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
   if (focusable) focusable.focus();
 }
+
 function modalReturnFocus() {
+  if (activeModal) {
+    activeModal.removeEventListener('keydown', trapFocusKeydown);
+    activeModal = null;
+  }
   if (modalReturnEl?.focus) modalReturnEl.focus();
   modalReturnEl = null;
+}
+
+function trapFocusKeydown(e) {
+  if (e.key !== 'Tab' || !activeModal) return;
+  const focusables = activeModal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  if (!focusables.length) return;
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+
+function openModal(modal) {
+  if (modal.classList.contains('active')) return;
+  modal.classList.add('active');
+  modal.addEventListener('keydown', trapFocusKeydown);
+  modalFocus(modal);
 }
 
 // ── Events ─────────────────────────────────────────────────────────────────
@@ -1065,6 +1382,16 @@ document.getElementById('btn-reset').addEventListener('click', () => {
 document.getElementById('btn-randomize').addEventListener('click', () => {
   if (activeMoodId) animateRandomize(activeMoodId);
 });
+document.getElementById('btn-share').addEventListener('click', shareResult);
+document.getElementById('btn-export').addEventListener('click', exportHistory);
+document.getElementById('btn-import').addEventListener('click', () => {
+  document.getElementById('import-file').click();
+});
+document.getElementById('import-file').addEventListener('change', (e) => {
+  const file = e.target.files?.[0];
+  if (file) importHistory(file);
+  e.target.value = '';
+});
 document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
 document.getElementById('lang-toggle').addEventListener('click', cycleLang);
 
@@ -1081,7 +1408,7 @@ document.getElementById('easter-close').addEventListener('click', closeEaster);
 easterEl.addEventListener('click', e => { if (e.target === easterEl) closeEaster(); });
 
 const infoModal = document.getElementById('instructions-modal');
-function openInfo()  { infoModal.classList.add('active'); modalFocus(infoModal); }
+function openInfo()  { openModal(infoModal); }
 function closeInfo() {
   if (!infoModal.classList.contains('active')) return;
   infoModal.classList.remove('active');
@@ -1091,25 +1418,47 @@ document.getElementById('info-trigger').addEventListener('click', openInfo);
 document.getElementById('info-close').addEventListener('click', closeInfo);
 infoModal.addEventListener('click', e => { if (e.target === infoModal) closeInfo(); });
 
+document.getElementById('past-entry-close').addEventListener('click', closePastEntry);
+pastEntryModal.addEventListener('click', e => { if (e.target === pastEntryModal) closePastEntry(); });
+
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeEaster(); closeInfo(); }
+  if (e.key === 'Escape') { closeEaster(); closeInfo(); closePastEntry(); }
 });
 
 // ── Init ───────────────────────────────────────────────────────────────────
+function registerServiceWorker() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+}
+
+function updateSiteMeta() {
+  const base = SITE_BASE.replace(/\/$/, '');
+  const canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) canonical.href = `${base}/`;
+  const ogUrl = document.querySelector('meta[property="og:url"]');
+  if (ogUrl) ogUrl.content = `${base}/`;
+  const ogImage = document.querySelector('meta[property="og:image"]');
+  if (ogImage && !ogImage.content.startsWith(location.origin) && location.protocol.startsWith('http')) {
+    ogImage.content = `${base}/og-image.png`;
+  }
+}
+
 function init() {
+  updateSiteMeta();
   applyTheme(currentTheme);
   renderMoodButtons();
   applyLang(currentLang);   // sets all text after buttons exist
+  registerServiceWorker();
 
   const history    = loadHistory();
   const todayEntry = history[todayKey()];
+  renderCalendar();
 
   if (todayEntry) {
     showResult(todayEntry.moodId, todayEntry.idx ?? pickForDay(todayEntry.moodId, todayKey()), true);
-    renderCalendar();
   } else {
     screenSelector.style.display = 'block';
-    if (Object.keys(history).length > 0) renderCalendar();
   }
 }
 
