@@ -21,8 +21,8 @@
   <meta property="og:locale:alternate"   content="en_US">
   <meta property="og:locale:alternate"   content="pt_BR">
   <meta property="og:site_name"   content="emoji del día">
-  <meta property="og:url"         content="https://hector-mendoza.github.io/emoji-day/">
-  <meta property="og:image"       content="https://hector-mendoza.github.io/emoji-day/og-image.png">
+  <meta property="og:url"         content="__SITE_URL__/">
+  <meta property="og:image"       content="__SITE_URL__/og-image.png">
   <meta property="og:image:width"  content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt"   content="emoji del día — mood tracker with daily emoji">
@@ -31,15 +31,15 @@
   <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:title"       content="emoji del día">
   <meta name="twitter:description" content="Un diagnóstico emocional de dudosa precisión. Tu emoji del día, seeded por fecha.">
-  <meta name="twitter:image"       content="https://hector-mendoza.github.io/emoji-day/og-image.png">
+  <meta name="twitter:image"       content="__SITE_URL__/og-image.png">
 
   <!-- ── GEO (Generative Engine Optimization) ── -->
   <meta name="ai-content-declaration" content="human-authored">
-  <link rel="canonical" href="https://hector-mendoza.github.io/emoji-day/">
-  <link rel="alternate" hreflang="es" href="https://hector-mendoza.github.io/emoji-day/?lang=es">
-  <link rel="alternate" hreflang="en" href="https://hector-mendoza.github.io/emoji-day/?lang=en">
-  <link rel="alternate" hreflang="pt" href="https://hector-mendoza.github.io/emoji-day/?lang=pt">
-  <link rel="alternate" hreflang="x-default" href="https://hector-mendoza.github.io/emoji-day/">
+  <link rel="canonical" href="__SITE_URL__/">
+  <link rel="alternate" hreflang="es" href="__SITE_URL__/?lang=es">
+  <link rel="alternate" hreflang="en" href="__SITE_URL__/?lang=en">
+  <link rel="alternate" hreflang="pt" href="__SITE_URL__/?lang=pt">
+  <link rel="alternate" hreflang="x-default" href="__SITE_URL__/">
   <link rel="manifest" href="manifest.webmanifest">
 
   <!-- ── Structured data (WebApplication + FAQPage) ── -->
@@ -715,10 +715,12 @@
 <script>
 // ── Site config ───────────────────────────────────────────────────────────
 const SITE_BASE = (() => {
-  const fallback = 'https://hector-mendoza.github.io/emoji-day';
-  if (location.protocol === 'file:' || !location.origin || location.origin === 'null') return fallback;
-  const path = location.pathname.replace(/\/index\.html$/i, '').replace(/\/$/, '') || '';
-  return location.origin + path;
+  if (location.protocol.startsWith('http')) {
+    const path = location.pathname.replace(/\/index\.html$/i, '').replace(/\/$/, '') || '';
+    return location.origin + path;
+  }
+  const injected = '__SITE_URL__';
+  return injected.startsWith('http') ? injected.replace(/\/$/, '') : injected;
 })();
 
 // ── Language data ──────────────────────────────────────────────────────────
@@ -1433,15 +1435,19 @@ function registerServiceWorker() {
 }
 
 function updateSiteMeta() {
+  if (!location.protocol.startsWith('http')) return;
   const base = SITE_BASE.replace(/\/$/, '');
-  const canonical = document.querySelector('link[rel="canonical"]');
-  if (canonical) canonical.href = `${base}/`;
+  document.querySelector('link[rel="canonical"]')?.setAttribute('href', `${base}/`);
   const ogUrl = document.querySelector('meta[property="og:url"]');
   if (ogUrl) ogUrl.content = `${base}/`;
   const ogImage = document.querySelector('meta[property="og:image"]');
-  if (ogImage && !ogImage.content.startsWith(location.origin) && location.protocol.startsWith('http')) {
-    ogImage.content = `${base}/og-image.png`;
-  }
+  if (ogImage) ogImage.content = `${base}/og-image.png`;
+  const twImage = document.querySelector('meta[name="twitter:image"]');
+  if (twImage) twImage.content = `${base}/og-image.png`;
+  document.querySelectorAll('link[hreflang]').forEach((link) => {
+    const lang = link.getAttribute('hreflang');
+    link.href = lang === 'x-default' ? `${base}/` : `${base}/?lang=${lang}`;
+  });
 }
 
 function init() {

@@ -24,4 +24,4 @@ User-agent: Amazonbot
 Allow: /
 
 # Sitemap
-Sitemap: https://hector-mendoza.github.io/emoji-day/sitemap.xml
+Sitemap: __SITE_URL__/sitemap.xml
