@@ -10,13 +10,19 @@
       ]
     },
     {
-      "source": "/fonts/(.*)",
+      "source": "/fonts/:path*",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
     },
     {
-      "source": "/(.*\\.(png|svg|webp|ico))",
+      "source": "/:path*.png",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    },
+    {
+      "source": "/:path*.svg",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=86400" }
       ]
