@@ -108,6 +108,7 @@
 
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -183,6 +184,9 @@
       position: relative;
     }
     .logo {
+      background: none;
+      border: none;
+      padding: 0;
       cursor: pointer;
       flex-shrink: 0;
       color: var(--text);
@@ -497,13 +501,23 @@
       .mood-grid { grid-template-columns: repeat(2,1fr); }
       .cal-grid { gap: 3px; }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      ::view-transition-old(root),
+      ::view-transition-new(root) { animation: none !important; }
+    }
   </style>
 </head>
 <body>
 
 <div id="theme-overlay"></div>
 
-<div id="instructions-modal" role="dialog" aria-modal="true">
+<div id="instructions-modal" role="dialog" aria-modal="true" aria-labelledby="info-title">
   <div class="instructions-inner">
     <h2 id="info-title"></h2>
     <ol class="instructions-steps" id="info-steps"></ol>
@@ -511,7 +525,7 @@
   </div>
 </div>
 
-<div id="easter-egg" role="dialog" aria-modal="true">
+<div id="easter-egg" role="dialog" aria-modal="true" aria-labelledby="easter-title">
   <div class="easter-inner">
     <span class="easter-emoji" id="easter-emoji"></span>
     <h2 id="easter-title"></h2>
@@ -524,8 +538,8 @@
   <div class="header-inner">
     <button class="ctrl-btn" id="lang-toggle" aria-label="Change language">ES</button>
 
-    <div class="logo" id="logo">
-      <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <button type="button" class="logo" id="logo">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
         <line x1="17" y1="1.5"  x2="17" y2="5.5"  stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         <line x1="17" y1="28.5" x2="17" y2="32.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         <line x1="1.5"  y1="17" x2="5.5"  y2="17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -540,7 +554,7 @@
         <circle cx="19.8" cy="15.5" r="1.15" fill="currentColor"/>
         <path d="M13.5 19.5 Q17 22.5 20.5 19.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
       </svg>
-    </div>
+    </button>
 
     <h1 id="site-title">emoji del día</h1>
     <button class="ctrl-btn" id="theme-toggle" aria-label="Toggle theme">☀️</button>
@@ -567,7 +581,7 @@
 
 <div class="card" id="section-history">
   <h2 id="historial-title"></h2>
-  <div class="cal-grid" id="cal-grid"></div>
+  <div class="cal-grid" id="cal-grid" role="grid" aria-labelledby="historial-title"></div>
 </div>
 
 <script>
@@ -591,6 +605,10 @@ const UI = {
     registeredOn: 'Registrado el',
     closeEaster:  'Cerrar esto inmediatamente',
     logoTitle:    'haz clic varias veces… si te atreves',
+    logoAriaLabel:'Logo — haz clic varias veces… si te atreves',
+    langToggleLabel: 'Cambiar idioma',
+    themeToggleLabel: 'Cambiar tema',
+    footerMadeBy: 'hecho por',
     metaDesc:     'Un diagnóstico emocional de dudosa precisión. Elige tu humor del día y descubre tu emoji. Historial de 30 días, sin cuentas, sin backend.',
     ogTitle:      'emoji del día — un diagnóstico emocional de dudosa precisión',
     moods: { feliz:'Feliz', cansado:'Cansado', estresado:'Estresado', motivado:'Motivado', caotico:'Caótico', misterioso:'Misterioso', hambriento:'Hambriento', filosofico:'Filosófico' },
@@ -624,6 +642,10 @@ const UI = {
     registeredOn: 'Logged on',
     closeEaster:  'Close this immediately',
     logoTitle:    'click several times… if you dare',
+    logoAriaLabel:'Logo — click several times… if you dare',
+    langToggleLabel: 'Change language',
+    themeToggleLabel: 'Toggle theme',
+    footerMadeBy: 'made by',
     metaDesc:     'An emotional diagnosis of questionable accuracy. Pick your mood and get your emoji of the day. 30-day history, no accounts, no backend.',
     ogTitle:      'emoji of the day — an emotional diagnosis of questionable accuracy',
     moods: { feliz:'Happy', cansado:'Tired', estresado:'Stressed', motivado:'Motivated', caotico:'Chaotic', misterioso:'Mysterious', hambriento:'Hungry', filosofico:'Philosophical' },
@@ -657,6 +679,10 @@ const UI = {
     registeredOn: 'Registrado em',
     closeEaster:  'Fechar isso imediatamente',
     logoTitle:    'clique várias vezes… se tiver coragem',
+    logoAriaLabel:'Logo — clique várias vezes… se tiver coragem',
+    langToggleLabel: 'Mudar idioma',
+    themeToggleLabel: 'Alternar tema',
+    footerMadeBy: 'feito por',
     metaDesc:     'Um diagnóstico emocional de duvidosa precisão. Escolha seu humor do dia e descubra seu emoji. Histórico de 30 dias, sem contas, sem backend.',
     ogTitle:      'emoji do dia — um diagnóstico emocional de duvidosa precisão',
     moods: { feliz:'Feliz', cansado:'Cansado', estresado:'Estressado', motivado:'Motivado', caotico:'Caótico', misterioso:'Misterioso', hambriento:'Faminto', filosofico:'Filosófico' },
@@ -760,8 +786,17 @@ const LS_KEY   = 'emojiday_v2';
 const LS_THEME = 'emojiday_theme';
 const LS_LANG  = 'emojiday_lang';
 function loadHistory() { try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch { return {}; } }
+function pruneHistory(h) {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 30);
+  const cutoffKey = dateKey(cutoff);
+  for (const k of Object.keys(h)) {
+    if (k < cutoffKey) delete h[k];
+  }
+  return h;
+}
 function saveEntry(dateStr, moodId, idx) {
-  const h = loadHistory();
+  const h = pruneHistory(loadHistory());
   h[dateStr] = { moodId, idx };
   localStorage.setItem(LS_KEY, JSON.stringify(h));
 }
@@ -819,7 +854,11 @@ function applyLang(lang) {
   document.getElementById('btn-reset').textContent       = t.changeHumor;
   document.getElementById('easter-close').textContent    = t.closeEaster;
   document.getElementById('lang-toggle').textContent     = lang.toUpperCase();
+  document.getElementById('lang-toggle').setAttribute('aria-label', t.langToggleLabel);
+  document.getElementById('theme-toggle').setAttribute('aria-label', t.themeToggleLabel);
   document.getElementById('logo').title = t.logoTitle;
+  document.getElementById('logo').setAttribute('aria-label', t.logoAriaLabel);
+  document.getElementById('footer-made-by').textContent = t.footerMadeBy;
 
   // Update info trigger & modal
   const hw = t.howItWorks;
@@ -934,11 +973,17 @@ function renderCalendar() {
 
     if (entry) {
       const emoji = EMOJIS[entry.moodId]?.[entry.idx] ?? '?';
-      cell.innerHTML = `<span class="cal-emoji">${emoji}</span><span class="cal-num">${d.getDate()}</span>`;
-      cell.dataset.tip  = UI[currentLang].moods[entry.moodId] ?? entry.moodId;
+      const moodLabel = UI[currentLang].moods[entry.moodId] ?? entry.moodId;
+      cell.innerHTML = `<span class="cal-emoji" aria-hidden="true">${emoji}</span><span class="cal-num">${d.getDate()}</span>`;
+      cell.dataset.tip  = moodLabel;
       cell.dataset.mood = entry.moodId;
+      cell.setAttribute('role', 'gridcell');
+      cell.setAttribute('title', moodLabel);
+      cell.setAttribute('aria-label', `${formatDate(key)} — ${moodLabel}`);
     } else {
       cell.innerHTML = `<span class="cal-num">${d.getDate()}</span>`;
+      cell.setAttribute('role', 'gridcell');
+      cell.setAttribute('aria-label', formatDate(key));
     }
     calGridEl.appendChild(cell);
   }
@@ -984,8 +1029,25 @@ function triggerEasterEgg() {
   reAnimate(inner);
   reAnimate(easterEl.querySelector('.easter-emoji'));
   easterEl.classList.add('active');
+  modalFocus(easterEl);
 }
-function closeEaster() { easterEl.classList.remove('active'); }
+function closeEaster() {
+  if (!easterEl.classList.contains('active')) return;
+  easterEl.classList.remove('active');
+  modalReturnFocus();
+}
+
+// ── Modal focus ────────────────────────────────────────────────────────────
+let modalReturnEl = null;
+function modalFocus(modal) {
+  modalReturnEl = document.activeElement;
+  const focusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  if (focusable) focusable.focus();
+}
+function modalReturnFocus() {
+  if (modalReturnEl?.focus) modalReturnEl.focus();
+  modalReturnEl = null;
+}
 
 // ── Events ─────────────────────────────────────────────────────────────────
 function onMoodSelected(moodId) {
@@ -1019,8 +1081,12 @@ document.getElementById('easter-close').addEventListener('click', closeEaster);
 easterEl.addEventListener('click', e => { if (e.target === easterEl) closeEaster(); });
 
 const infoModal = document.getElementById('instructions-modal');
-function openInfo()  { infoModal.classList.add('active'); }
-function closeInfo() { infoModal.classList.remove('active'); }
+function openInfo()  { infoModal.classList.add('active'); modalFocus(infoModal); }
+function closeInfo() {
+  if (!infoModal.classList.contains('active')) return;
+  infoModal.classList.remove('active');
+  modalReturnFocus();
+}
 document.getElementById('info-trigger').addEventListener('click', openInfo);
 document.getElementById('info-close').addEventListener('click', closeInfo);
 infoModal.addEventListener('click', e => { if (e.target === infoModal) closeInfo(); });
@@ -1051,7 +1117,7 @@ init();
 </script>
 
 <footer class="site-footer">
-  made by <a href="https://www.hectormendoza.me/" target="_blank" rel="noopener">🌟 hector mendoza</a>
+  <span id="footer-made-by">made by</span> <a href="https://www.hectormendoza.me/" target="_blank" rel="noopener">🌟 hector mendoza</a>
 </footer>
 </body>
 </html>
