@@ -24,4 +24,4 @@ User-agent: Amazonbot
 Allow: /
 
 # Sitemap
-Sitemap: __SITE_URL__/sitemap.xml
+Sitemap: https://emoji-day-hm.vercel.app/sitemap.xml

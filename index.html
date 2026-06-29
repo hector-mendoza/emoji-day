@@ -21,8 +21,8 @@
   <meta property="og:locale:alternate"   content="en_US">
   <meta property="og:locale:alternate"   content="pt_BR">
   <meta property="og:site_name"   content="emoji del día">
-  <meta property="og:url"         content="__SITE_URL__/">
-  <meta property="og:image"       content="__SITE_URL__/og-image.png">
+  <meta property="og:url"         content="https://emoji-day-hm.vercel.app/">
+  <meta property="og:image"       content="https://emoji-day-hm.vercel.app/og-image.png">
   <meta property="og:image:width"  content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt"   content="emoji del día — mood tracker with daily emoji">
@@ -31,15 +31,15 @@
   <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:title"       content="emoji del día">
   <meta name="twitter:description" content="Un diagnóstico emocional de dudosa precisión. Tu emoji del día, seeded por fecha.">
-  <meta name="twitter:image"       content="__SITE_URL__/og-image.png">
+  <meta name="twitter:image"       content="https://emoji-day-hm.vercel.app/og-image.png">
 
   <!-- ── GEO (Generative Engine Optimization) ── -->
   <meta name="ai-content-declaration" content="human-authored">
-  <link rel="canonical" href="__SITE_URL__/">
-  <link rel="alternate" hreflang="es" href="__SITE_URL__/?lang=es">
-  <link rel="alternate" hreflang="en" href="__SITE_URL__/?lang=en">
-  <link rel="alternate" hreflang="pt" href="__SITE_URL__/?lang=pt">
-  <link rel="alternate" hreflang="x-default" href="__SITE_URL__/">
+  <link rel="canonical" href="https://emoji-day-hm.vercel.app/">
+  <link rel="alternate" hreflang="es" href="https://emoji-day-hm.vercel.app/?lang=es">
+  <link rel="alternate" hreflang="en" href="https://emoji-day-hm.vercel.app/?lang=en">
+  <link rel="alternate" hreflang="pt" href="https://emoji-day-hm.vercel.app/?lang=pt">
+  <link rel="alternate" hreflang="x-default" href="https://emoji-day-hm.vercel.app/">
   <link rel="manifest" href="manifest.webmanifest">
 
   <!-- ── Structured data (WebApplication + FAQPage) ── -->
@@ -719,7 +719,7 @@ const SITE_BASE = (() => {
     const path = location.pathname.replace(/\/index\.html$/i, '').replace(/\/$/, '') || '';
     return location.origin + path;
   }
-  const injected = '__SITE_URL__';
+  const injected = 'https://emoji-day-hm.vercel.app';
   return injected.startsWith('http') ? injected.replace(/\/$/, '') : injected;
 })();
 
