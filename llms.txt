@@ -35,7 +35,7 @@ A 30-day history grid shows past entries. One mood per day. Everything is stored
 | Markup | Single `index.html` |
 | Styles | CSS custom properties, View Transitions API |
 | Logic | Vanilla JS (ES2020), no framework, no bundler |
-| Font | Space Grotesk via Google Fonts |
+| Font | Space Grotesk (self-hosted) |
 | Storage | `localStorage` only — no network requests from app logic |
 | Favicon | Adaptive SVG (`favicon.svg`) with `prefers-color-scheme` |
 

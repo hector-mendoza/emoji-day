@@ -945,13 +945,10 @@ const DESCS = {
 };
 
 // ── Utilities ──────────────────────────────────────────────────────────────
-function todayKey() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
 function dateKey(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
+function todayKey() { return dateKey(new Date()); }
 function seededRandom(seed) {
   let s = seed;
   return () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
@@ -1369,7 +1366,6 @@ function triggerEasterEgg() {
   const inner = easterEl.querySelector('.easter-inner');
   reAnimate(inner);
   reAnimate(easterEl.querySelector('.easter-emoji'));
-  easterEl.classList.add('active');
   openModal(easterEl);
 }
 function closeEaster() {

@@ -1,83 +1,105 @@
-# ☀️ Emoji del Dia
+<p align="center">
+  <img src="favicon.svg" width="56" height="56" alt="emoji del día">
+</p>
 
-![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg)
+<h1 align="center">emoji del día</h1>
 
-> *Un diagnóstico emocional de dudosa precisión.*  
-> *An emotional diagnosis of questionable accuracy.*  
-> *Um diagnóstico emocional de duvidosa precisão.*
+<p align="center">
+  <em>Un diagnóstico emocional de dudosa precisión.</em><br>
+  <em>An emotional diagnosis of questionable accuracy.</em><br>
+  <em>Um diagnóstico emocional de duvidosa precisão.</em>
+</p>
 
----
+<p align="center">
+  <a href="https://emoji-day-hm.vercel.app/">Live experience</a>
+  &nbsp;·&nbsp;
+  <a href="LICENSE">MIT License</a>
+</p>
 
-## What is this?
-
-A single-page web app that asks how you're feeling, assigns you an emoji for the day, and provides a short, funny description that is neither therapeutic nor scientifically valid. It also keeps a 30-day history so you can look back and feel things about your past feelings.
-
-Basically: a mood tracker that doesn't take itself seriously. Which is exactly what the world needs more of.
-
----
-
-## Features
-
-- **Daily mood selection** — 8 moods, from `Feliz` to `Filosófico`
-- **Date-seeded results** — same mood on the same day always gives you the same emoji. Consistent unreliability.
-- **🎲 Randomizer** — slot-machine animation that picks a different result from your mood's pool
-- **30-day history** — a calendar grid showing your emoji log, stored in LocalStorage
-- **🌙 / ☀️ Theme toggle** — dark and light mode with View Transitions API (the funny animated kind)
-- **ES / EN / PT** — three languages, one cynical tone
-- **Easter egg** — click the sun logo 7 times. We're not going to tell you what happens.
-- **Zero dependencies** — plain HTML, CSS, and vanilla JS. No framework, no build step, no `node_modules` folder judging you.
+<p align="center">
+  <img src="https://img.shields.io/badge/stack-vanilla%20HTML%20%2F%20CSS%20%2F%20JS-111110?style=flat-square&labelColor=1a1a18&color=d97941" alt="Stack">
+  <img src="https://img.shields.io/badge/dependencies-none-111110?style=flat-square&labelColor=1a1a18&color=d97941" alt="Dependencies">
+  <img src="https://img.shields.io/badge/data-local%20only-111110?style=flat-square&labelColor=1a1a18&color=d97941" alt="Data">
+</p>
 
 ---
 
-## Stack
+## The idea
 
-| Thing | What |
+**emoji del día** is a single-page mood ritual: you choose how you feel, receive a date-seeded emoji and a short, self-aware description, and build a private 30-day archive of your emotional weather.
+
+It is deliberately not a wellness product. No streaks, no gamification, no advice dressed up as insight — just a small, well-crafted moment of reflection with a sense of humor.
+
+---
+
+## What you get
+
+| | |
 |---|---|
-| HTML | One file |
-| CSS | Custom properties, View Transitions API, system font + Space Grotesk |
-| JavaScript | Vanilla, ES2020, no bundler |
-| Storage | `localStorage` only |
-| Backend | There is no backend |
-| Framework | No |
+| **Daily mood selection** | Eight moods — from *Feliz* to *Filosófico* — each with its own emoji pool and voice. |
+| **Date-seeded results** | Same mood, same day, same emoji. Consistent unreliability you can count on. |
+| **Randomizer** | A slot-machine re-roll when the universe's first draft doesn't land. |
+| **30-day history** | A calendar grid of past entries, stored entirely on your device. |
+| **Theme & language** | Dark and light modes with View Transitions. Spanish, English, and Portuguese — one tone throughout. |
+| **Offline-ready** | Service worker and self-hosted typography. Works after the first visit, no network required. |
+| **Private by design** | No accounts, no backend, no telemetry. Your history never leaves the browser. |
 
 ---
 
-## Running it
+## Architecture
 
-```bash
-# Option 1 — just open it
-open index.html
-
-# Option 2 — serve it locally (any static server works)
-npx serve .
-python -m http.server
-```
-
-That's it. There's no `npm install`. You're welcome.
-
----
-
-## File structure
+Built as a single artifact — no framework, no build step, no `node_modules`.
 
 ```
 emoji-day/
-├── index.html     ← the whole app
-├── favicon.svg    ← adaptive sun face (dark/light mode aware)
-└── README.md      ← you are here
+├── index.html              Application (markup, styles, logic)
+├── sw.js                   Offline cache & service worker
+├── manifest.webmanifest    Installable PWA metadata
+├── fonts/                  Self-hosted Space Grotesk
+├── favicon.svg             Adaptive sun icon (light / dark)
+├── icon-192.png            PWA icon
+├── icon-512.png            PWA icon (maskable)
+├── og-image.png            Social preview
+├── robots.txt              Crawler policy
+├── sitemap.xml             Canonical URLs
+├── llms.txt                Machine-readable product summary
+├── scripts/
+│   └── set-site-url.sh     Vercel build: sync production URL
+└── vercel.json             Static deploy & cache headers
 ```
+
+**Stack:** HTML · CSS custom properties · View Transitions API · vanilla ES2020 · LocalStorage
+
+---
+
+## Run locally
+
+Open the file directly, or serve the directory with any static server:
+
+```bash
+python3 -m http.server 8080
+# or
+npx serve .
+```
+
+Then visit `http://localhost:8080`.
+
+There is nothing to install. That is intentional.
 
 ---
 
 ## Browser support
 
-Works in any modern browser. The View Transition animations (the fun part of the theme toggle) require Chrome 111+. On older browsers it just… switches themes. Less dramatic, equally functional.
+Modern browsers. View Transition animations on theme toggle require Chrome 111+; elsewhere the theme still switches — just without the flourish.
 
 ---
 
-## Credits
+## Author
 
-Built by **[Hector Mendoza](https://www.hectormendoza.me/)** — with an unreasonable amount of attention paid to the funny descriptions.
+Crafted by **[Hector Mendoza](https://www.hectormendoza.me/)**.
 
 ---
 
-*No emojis were harmed in the making of this project. Several were mildly inconvenienced.*
+<p align="center">
+  <sub>No emojis were harmed. Several were mildly inconvenienced.</sub>
+</p>
